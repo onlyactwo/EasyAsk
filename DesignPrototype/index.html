@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EasyAsk · 简洁主题原型</title>
+  <style>
+    :root { --ink:#3f2d20; --sub:#927d67; --accent:#e68a31; --line:#ebddc8; --paper:#fffdf8; --sidebar:#fff2db; --font:"Avenir Next","PingFang SC",sans-serif; }
+    * { box-sizing:border-box; }
+    html,body { margin:0; min-height:100%; }
+    body { font-family:var(--font); color:var(--ink); background:radial-gradient(circle at 0 90%,#efab76 0,transparent 34%),radial-gradient(circle at 98% 5%,#c4d9e8 0,transparent 28%),#f4e9db; }
+    button,input { font:inherit; } button { cursor:pointer; }
+    svg { width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+    .stage { max-width:1090px; margin:0 auto; padding:34px 20px 42px; }
+    .stage-header { display:flex; justify-content:space-between; align-items:center; margin:0 0 22px; }
+    .stage-header h1 { margin:0; font-size:19px; letter-spacing:-.04em; }
+    .tabs { display:flex; gap:4px; border:1px solid #ead9c2; background:#fff9f0; padding:4px; border-radius:10px; }
+    .tabs button { border:0; border-radius:7px; background:transparent; color:#987556; padding:8px 13px; font-size:11px; font-weight:700; }
+    .tabs button.active { background:#a85c2a; color:#fff; }
+    .panel { width:100%; height:620px; display:flex; overflow:hidden; border-radius:24px; border:1px solid #e5d3ba; background:var(--paper); box-shadow:0 24px 64px rgba(86,48,20,.18),0 3px 12px rgba(86,48,20,.06); }
+    .sidebar { width:250px; flex:none; position:relative; background:linear-gradient(155deg,#fff5e5,#fbe9c8); border-right:1px solid #e8d2b3; padding:28px 16px; }
+    .brand { display:flex; align-items:center; gap:6px; padding:0 10px; font-weight:800; font-size:24px; letter-spacing:-.055em; }
+    .brand b { color:#e78227; }
+    .brand-rays { color:#e99936; font-size:24px; transform:translate(-5px,-9px) rotate(-12deg); }
+    .new-chat { display:flex; align-items:center; gap:8px; justify-content:center; width:100%; margin:30px 0 31px; padding:12px; border-radius:12px; border:1px solid #efc487; background:#ffe2b3; color:#53331e; font-size:13px; font-weight:800; }
+    .new-chat svg { width:17px; height:17px; }
+    .history-label { margin:0 10px 11px; color:#9c8062; font-size:11px; font-weight:700; }
+    .history { display:block; width:100%; padding:11px 10px; border:0; border-radius:9px; text-align:left; background:transparent; color:#624936; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .history:hover,.history.active { background:rgba(255,255,255,.68); }
+    .history svg { width:16px; height:16px; vertical-align:-3px; margin-right:9px; color:#aa9073; }
+    .sidebar-footer { position:absolute; left:17px; bottom:24px; }
+    .gear { display:grid; place-items:center; width:35px; height:35px; border:0; border-radius:9px; color:#a78362; background:transparent; }
+    .gear:hover { background:rgba(255,255,255,.65); }
+    .side-mascot { pointer-events:none; position:absolute; z-index:3; width:205px; right:-67px; bottom:-24px; }
+    .side-mascot img { display:block; width:100%; height:auto; }
+    .main { flex:1; min-width:0; min-height:0; display:flex; flex-direction:column; position:relative; background:#fffdfa; }
+    .main::before { content:""; pointer-events:none; position:absolute; right:-78px; top:62px; width:295px; height:225px; border-radius:50%; border:34px solid rgba(248,205,116,.11); transform:rotate(-20deg); }
+    .screen { display:none; flex:1; min-height:0; flex-direction:column; }
+    .screen.active { display:flex; }
+    .empty { flex:1; display:grid; place-items:center; }
+    .empty h2 { position:relative; margin:-12px 0 0; font-size:34px; font-weight:800; letter-spacing:-.055em; }
+    .empty h2::after { content:""; position:absolute; width:8px; height:19px; right:-18px; top:-16px; border-radius:5px; background:#ed9a39; transform:rotate(25deg); box-shadow:16px 12px 0 -1px #ed9a39; }
+    .composer { position:relative; display:flex; align-items:center; gap:12px; margin:0 28px 28px 29px; min-height:57px; border:1px solid #e7dbc9; border-radius:17px; padding:8px 9px 8px 13px; background:#fff; box-shadow:0 3px 17px rgba(87,53,20,.05); }
+    .icon { flex:none; display:grid; place-items:center; width:30px; height:30px; padding:0; background:transparent; border:0; color:#a28e79; }
+    .composer input { min-width:0; width:100%; flex:1; border:0; outline:0; background:transparent; color:var(--ink); font-size:12px; }
+    .composer input::placeholder { color:#a69b8f; }
+    .think { display:flex; align-items:center; gap:7px; border:0; background:transparent; color:#695646; font-size:11px; white-space:nowrap; }
+    .switch { width:29px; height:17px; display:block; border-radius:20px; background:#cfcac2; padding:2px; transition:background .15s; }
+    .switch::before { content:""; display:block; width:13px; height:13px; border-radius:50%; background:white; transition:transform .15s; }
+    .think.on .switch { background:#e8973b; }
+    .think.on .switch::before { transform:translateX(12px); }
+    .send { flex:none; display:grid; place-items:center; width:39px; height:39px; border:0; border-radius:12px; color:#fff; background:var(--accent); }
+    .send:hover { background:#d97923; }
+    .content-header { padding:29px 35px 21px; border-bottom:1px solid #f0e7d9; font-size:15px; font-weight:800; }
+    .messages { flex:1; min-height:0; padding:27px 36px; overflow:auto; font-size:12px; line-height:1.85; }
+    .user-line { max-width:420px; width:max-content; margin:0 0 23px auto; padding:11px 15px; border-radius:14px 14px 4px 14px; background:#fff0da; }
+    .answer-label { display:flex; gap:8px; align-items:center; font-size:11px; font-weight:800; color:#a15e2d; }
+    .answer-label .sun { width:25px; height:25px; display:grid; place-items:center; border-radius:8px; background:#fff0ce; }
+    .answer-label svg { width:15px; height:15px; }
+    .answer { max-width:530px; margin:7px 0 0 33px; }
+    .answer p { margin:0 0 11px; }
+    .answer strong { color:#97551f; }
+    .answer ul { padding-left:17px; margin:0 0 10px; }
+    .answer-actions { margin:0 0 0 33px; border:0; padding:0; background:transparent; color:#a7947d; font-size:10px; }
+    .settings { padding:30px 38px; overflow:auto; }
+    .settings h2 { margin:0 0 24px; font-size:21px; }
+    .setting-row { display:flex; align-items:center; justify-content:space-between; padding:15px 0; border-bottom:1px solid #efe5d7; font-size:12px; }
+    .setting-row button { border:0; border-radius:8px; padding:6px 9px; background:#fff3df; color:#995926; font-size:10px; }
+    .settings-foot { display:flex; gap:16px; margin-top:26px; }
+    .settings-foot button { border:0; padding:0; background:transparent; color:#99816b; font-size:11px; }
+    @media(max-width:760px) { .stage{padding:14px}.panel{height:600px}.sidebar{width:195px}.side-mascot{width:162px;right:-52px}.empty h2{font-size:27px}.composer{margin:0 15px 18px}.think{font-size:0}.think .switch{font-size:initial} }
+  </style>
+</head>
+<body>
+  <svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <symbol id="plus" viewBox="0 0 24 24"><path d="M12 4v16M4 12h16"/></symbol>
+    <symbol id="chat" viewBox="0 0 24 24"><path d="M20 11.5a8 8 0 0 1-8 8c-1.4 0-2.8-.4-4-1L3 21l1.5-5A8 8 0 1 1 20 11.5Z"/></symbol>
+    <symbol id="gear" viewBox="0 0 24 24"><path d="m10 2-.6 2-2 .8-1.8-1-2.5 2.5 1 1.8-.8 2-2 .6v3.6l2 .6.8 2-1 1.8 2.5 2.5 1.8-1 2 .8.6 2h3.6l.6-2 2-.8 1.8 1 2.5-2.5-1-1.8.8-2 2-.6v-3.6l-2-.6-.8-2 1-1.8-2.5-2.5-1.8 1-2-.8-.6-2Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8" cy="9" r="1.5"/><path d="m4 18 6-6 3 3 3-3 5 5"/></symbol>
+    <symbol id="send" viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6"/></symbol>
+    <symbol id="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></symbol>
+  </svg>
+  <div class="stage">
+    <header class="stage-header"><h1>EasyAsk · 简洁主题原型</h1><nav class="tabs" aria-label="原型页面"><button class="active" data-screen="welcome">新聊天</button><button data-screen="conversation">对话</button><button data-screen="settings">设置</button></nav></header>
+    <div class="panel">
+      <aside class="sidebar">
+        <div class="brand">Easy<b>Ask</b><span class="brand-rays">⌁</span></div>
+        <button class="new-chat" data-screen="welcome"><svg><use href="#plus"/></svg>新建聊天</button>
+        <div class="history-label">历史</div>
+        <button class="history" data-screen="conversation"><svg><use href="#chat"/></svg>如何高效学习？</button>
+        <button class="history" data-screen="conversation"><svg><use href="#chat"/></svg>周末去哪里玩？</button>
+        <div class="sidebar-footer"><button class="gear" data-screen="settings" aria-label="设置"><svg><use href="#gear"/></svg></button></div>
+        <div class="side-mascot"><img src="assets/mascot-side-peek.png" alt="从侧栏边缘探出的主题角色"></div>
+      </aside>
+      <main class="main">
+        <section class="screen active" id="welcome"><div class="empty"><h2>想问什么？</h2></div><form class="composer" data-submit><button type="button" class="icon" aria-label="添加图片"><svg><use href="#image"/></svg></button><input aria-label="输入问题" placeholder="问点什么…"><button type="button" class="think" aria-pressed="false"><span class="switch"></span>思考</button><button type="submit" class="send" aria-label="发送"><svg><use href="#send"/></svg></button></form></section>
+        <section class="screen" id="conversation"><div class="content-header">如何高效学习？</div><div class="messages"><div class="user-line">每天只有半小时，怎么安排学习？</div><div class="answer-label"><span class="sun"><svg><use href="#sun"/></svg></span>EasyAsk</div><div class="answer"><p>把半小时分成三个固定步骤，先保证每天都能开始：</p><ul><li><strong>5 分钟</strong>：回顾昨天的内容。</li><li><strong>20 分钟</strong>：只学一个小主题。</li><li><strong>5 分钟</strong>：写下一句总结。</li></ul><p>先坚持一周，再调整时长。</p></div><button class="answer-actions">复制回答</button></div><form class="composer" data-submit><button type="button" class="icon" aria-label="添加图片"><svg><use href="#image"/></svg></button><input aria-label="继续提问" placeholder="继续问…"><button type="button" class="think" aria-pressed="false"><span class="switch"></span>思考</button><button type="submit" class="send" aria-label="发送"><svg><use href="#send"/></svg></button></form></section>
+        <section class="screen" id="settings"><div class="settings"><h2>设置</h2><div class="setting-row"><span>主题</span><button>暖阳伙伴</button></div><div class="setting-row"><span>回答自动跟随</span><button>关闭</button></div><div class="setting-row"><span>全局快捷键</span><button>未设置</button></div><div class="setting-row"><span>API Key</span><button>已设置</button></div><div class="settings-foot"><button>重启 EasyAsk</button><button>退出 EasyAsk</button></div></div></section>
+      </main>
+    </div>
+  </div>
+  <script>
+    const screens = new Set(['welcome','conversation','settings']);
+    function show(screen) {
+      if (!screens.has(screen)) return;
+      document.querySelectorAll('.screen').forEach(el => el.classList.toggle('active', el.id === screen));
+      document.querySelectorAll('.tabs button').forEach(el => el.classList.toggle('active', el.dataset.screen === screen));
+    }
+    document.querySelectorAll('[data-screen]').forEach(el => el.addEventListener('click', () => show(el.dataset.screen)));
+    document.querySelectorAll('.think').forEach(el => el.addEventListener('click', () => { el.classList.toggle('on'); el.setAttribute('aria-pressed', el.classList.contains('on')); }));
+    document.querySelectorAll('[data-submit]').forEach(el => el.addEventListener('submit', event => { event.preventDefault(); show('conversation'); }));
+    show(new URLSearchParams(location.search).get('screen') || 'welcome');
+  </script>
+</body>
+</html>
